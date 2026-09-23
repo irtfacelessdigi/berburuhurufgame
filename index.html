@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Berburu Huruf</title>
+<style>
+  :root{
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    --sky-top:#5EC8F2;
+    --sky-bottom:#BDEBFF;
+    --grass-top:#8FE388;
+    --grass-bottom:#4CAF50;
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  *{box-sizing:border-box;}
+  html,body{
+    height:100%;
+    margin:0;
+    padding:0;
+    background:#3a8fd6;
+    font-family:'Baloo 2','Comic Sans MS','Segoe UI',system-ui,sans-serif;
+    overflow:hidden;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+  }
+  #stage{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  #game{
+    position:relative;
+    width:100%;
+    max-width:480px;
+    height:100%;
+    max-height:calc(480px * 16 / 9);
+    aspect-ratio:9/16;
+    overflow:hidden;
+    background:linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-bottom) 42%, var(--grass-top) 45%, var(--grass-bottom) 100%);
+    box-shadow:0 0 40px rgba(0,0,0,0.35);
+    border-radius:0;
+  }
+  @media (min-width:481px){
+    #game{ border-radius:28px; }
+  }
+
+  /* ---------- BACKGROUND DECOR ---------- */
+  .sun{
+    position:absolute; top:4%; right:8%;
+    width:60px; height:60px; border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #FFF6B0, #FFD24C 70%);
+    box-shadow:0 0 30px 10px rgba(255,210,76,0.55);
+  }
+  .cloud{
+    position:absolute;
+    background:#fff;
+    border-radius:50px;
+    opacity:0.95;
+    filter:drop-shadow(0 4px 4px rgba(0,0,0,0.05));
+  }
+  .cloud::before, .cloud::after{
+    content:"";
+    position:absolute;
+    background:#fff;
+    border-radius:50%;
+  }
+  .c1{ width:70px; height:26px; top:9%; left:6%; }
+  .c1::before{ width:34px; height:34px; top:-16px; left:8px; }
+  .c1::after{ width:26px; height:26px; top:-12px; left:36px; }
+  .c2{ width:56px; height:20px; top:16%; left:55%; }
+  .c2::before{ width:26px; height:26px; top:-12px; left:6px; }
+  .c2::after{ width:20px; height:20px; top:-9px; left:28px; }
+  .hill{
+    position:absolute;
+    left:-10%;
+    width:120%;
+    height:120px;
+    border-radius:50%;
+    background:#6FCB5E;
+    opacity:0.8;
+  }
+  .hill1{ bottom:8%; }
+  .hill2{ bottom:2%; background:#5CB84F; opacity:0.9; }
+  .tree{
+    position:absolute;
+    width:30px;
+    aspect-ratio:1/1.3;
+  }
+  .tree::before{
+    content:"";
+    position:absolute;
+    left:38%; bottom:0;
+    width:24%; height:45%;
+    background:#8B5A2B;
+    border-radius:2px;
+  }
+  .tree::after{
+    content:"";
+    position:absolute;
+    left:0; top:0;
+    width:100%; height:70%;
+    background:#5CB85C;
+    border-radius:50%;
+    box-shadow:-6px 10px 0 -2px #6FCB5E, 6px 10px 0 -2px #4FAE4F;
+  }
+  .flower{
+    position:absolute;
+    width:14px; height:14px;
+  }
+  .flower::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:var(--fc,#FF9E9E);
+    border-radius:50%;
+    box-shadow:
+      -8px 0 0 -3px var(--fc,#FF9E9E),
+      8px 0 0 -3px var(--fc,#FF9E9E),
+      0 -8px 0 -3px var(--fc,#FF9E9E),
+      0 8px 0 -3px var(--fc,#FF9E9E);
+  }
+  .flower::after{
+    content:"";
+    position:absolute;
+    left:35%; top:35%;
+    width:30%; height:30%;
+    background:#FFD24C;
+    border-radius:50%;
+  }
+
+  /* ---------- TOP UI ---------- */
+  #topbar{
+    position:absolute;
+    top:0; left:0; right:0;
+    padding:calc(10px + env(safe-area-inset-top,0px)) 10px 8px;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    z-index:20;
+    pointer-events:none;
+  }
+  .ui-box{
+    background:rgba(255,255,255,0.85);
+    border-radius:16px;
+    padding:6px 12px;
+    text-align:center;
+    box-shadow:0 3px 0 rgba(0,0,0,0.1);
+    min-width:64px;
+  }
+  .ui-label{
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:2px;
+    color:#5b6b73;
+    margin:0;
+  }
+  .ui-value{
+    font-size:22px;
+    font-weight:900;
+    color:#FF7A3D;
+    margin:0;
+    line-height:1.1;
+  }
+  #targetBox{
+    background:rgba(255,255,255,0.92);
+    border-radius:20px;
+    padding:4px 18px 8px;
+    text-align:center;
+    box-shadow:0 4px 0 rgba(0,0,0,0.12);
+  }
+  #targetBox .ui-label{ color:#3a6b8a; }
+  #targetLetter{
+    font-size:56px;
+    font-weight:900;
+    line-height:1;
+    color:#2E8B57;
+    -webkit-text-stroke:2px #1c5c39;
+    text-shadow:0 3px 0 rgba(0,0,0,0.15);
+    transition:transform 0.25s ease;
+  }
+  #targetLetter.pulse{ animation:pulseLetter 0.5s ease; }
+  @keyframes pulseLetter{
+    0%{ transform:scale(1); }
+    40%{ transform:scale(1.35) rotate(-6deg); }
+    100%{ transform:scale(1); }
+  }
+  #ageBadge{
+    position:absolute;
+    top:calc(88px + env(safe-area-inset-top,0px));
+    left:50%;
+    transform:translateX(-50%);
+    background:#FFD24C;
+    color:#7a4b00;
+    font-size:11px;
+    font-weight:800;
+    padding:3px 12px;
+    border-radius:12px;
+    box-shadow:0 2px 0 rgba(0,0,0,0.1);
+    z-index:20;
+    white-space:nowrap;
+  }
+  #skorLabel{ color:#3a6b8a; }
+  #terkumpulLabel{ color:#3a6b8a; }
+
+  /* ---------- PLAY AREA ---------- */
+  #playArea{
+    position:absolute;
+    inset:0;
+    z-index:10;
+  }
+
+  .obj{
+    position:absolute;
+    width:29vmin;
+    max-width:148px;
+    min-width:100px;
+    aspect-ratio:1/1;
+    cursor:pointer;
+    will-change:transform;
+    filter:drop-shadow(0 6px 6px rgba(0,0,0,0.28));
+  }
+  .obj svg{
+    width:100%;
+    height:100%;
+    display:block;
+    overflow:visible;
+  }
+
+  .obj.wrong-shake{
+    animation:shakeObj 0.4s ease;
+    filter:drop-shadow(0 0 10px rgba(255,60,60,0.85)) drop-shadow(0 6px 6px rgba(0,0,0,0.28));
+  }
+  @keyframes shakeObj{
+    0%,100%{ transform:translateX(0) rotate(0deg); }
+    20%{ transform:translateX(-8px) rotate(-6deg); }
+    40%{ transform:translateX(8px) rotate(6deg); }
+    60%{ transform:translateX(-6px) rotate(-4deg); }
+    80%{ transform:translateX(6px) rotate(4deg); }
+  }
+
+  .obj.correct-pop{
+    animation:popObj 0.45s ease forwards;
+    filter:drop-shadow(0 0 18px rgba(255,214,0,0.95)) drop-shadow(0 6px 6px rgba(0,0,0,0.28));
+  }
+  @keyframes popObj{
+    0%{ transform:scale(1); }
+    50%{ transform:scale(1.35); }
+    100%{ transform:scale(0.2); opacity:0; }
+  }
+
+  .sparkle{
+    position:absolute;
+    pointer-events:none;
+    font-size:20px;
+    animation:sparkleFly 0.6s ease forwards;
+    z-index:30;
+  }
+  @keyframes sparkleFly{
+    0%{ transform:translate(0,0) scale(0.5) rotate(0deg); opacity:1; }
+    100%{ transform:translate(var(--dx),var(--dy)) scale(1.2) rotate(180deg); opacity:0; }
+  }
+
+  /* ---------- CELEBRATION OVERLAY ---------- */
+  #celebrate{
+    position:absolute;
+    inset:0;
+    z-index:40;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(255,255,255,0);
+    pointer-events:none;
+    opacity:0;
+    transition:opacity 0.25s ease;
+  }
+  #celebrate.show{
+    opacity:1;
+    background:rgba(255,255,255,0.25);
+  }
+  #celebrate .msg{
+    background:#fff;
+    border-radius:28px;
+    padding:26px 34px;
+    text-align:center;
+    box-shadow:0 10px 0 rgba(0,0,0,0.15);
+    transform:scale(0.7);
+    transition:transform 0.35s cubic-bezier(.34,1.56,.64,1);
+  }
+  #celebrate.show .msg{ transform:scale(1); }
+  #celebrate .msg .big{
+    font-size:40px;
+    font-weight:900;
+    color:#FF7A3D;
+    margin:0 0 4px;
+  }
+  #celebrate .msg .small{
+    font-size:16px;
+    font-weight:700;
+    color:#3a6b8a;
+    margin:0;
+  }
+
+  /* ---------- START OVERLAY ---------- */
+  #startOverlay{
+    position:absolute;
+    inset:0;
+    z-index:50;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    background:linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-bottom) 45%, var(--grass-top) 60%, var(--grass-bottom) 100%);
+    padding:20px;
+  }
+  #startOverlay h1{
+    font-size:34px;
+    color:#fff;
+    -webkit-text-stroke:2px #E85D25;
+    text-shadow:0 4px 0 rgba(0,0,0,0.15);
+    margin:0 0 6px;
+    font-weight:900;
+  }
+  #startOverlay p{
+    color:#2b5470;
+    font-weight:700;
+    font-size:15px;
+    max-width:280px;
+    margin:0 0 22px;
+  }
+  #startBtn{
+    background:#FF7A3D;
+    color:#fff;
+    border:none;
+    font-size:22px;
+    font-weight:900;
+    padding:16px 44px;
+    border-radius:30px;
+    box-shadow:0 6px 0 #C9531D;
+    cursor:pointer;
+  }
+  #startBtn:active{
+    transform:translateY(4px);
+    box-shadow:0 2px 0 #C9531D;
+  }
+  .startIcons{ width:220px; max-width:70%; height:auto; margin-bottom:14px; filter:drop-shadow(0 4px 4px rgba(0,0,0,0.15)); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="game">
+
+    <!-- background decor -->
+    <div class="sun"></div>
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="hill hill1"></div>
+    <div class="hill hill2"></div>
+    <div class="tree" style="bottom:5%; left:6%; width:34px;"></div>
+    <div class="tree" style="bottom:9%; left:73%; width:28px;"></div>
+    <div class="flower" style="bottom:3%; left:26%; --fc:#FF8FC6;"></div>
+    <div class="flower" style="bottom:2%; left:58%; --fc:#FFD24C;"></div>
+    <div class="flower" style="bottom:1%; left:44%; --fc:#FF9E9E;"></div>
+
+    <div id="playArea"></div>
+
+    <div id="topbar">
+      <div class="ui-box">
+        <p class="ui-label" id="skorLabel">S K O R</p>
+        <p class="ui-value" id="skorVal">0</p>
+      </div>
+      <div id="targetBox">
+        <p class="ui-label">CARI HURUF</p>
+        <div id="targetLetter">b</div>
+      </div>
+      <div class="ui-box">
+        <p class="ui-label" id="terkumpulLabel">TERKUMPUL</p>
+        <p class="ui-value" id="terkumpulVal">0/5</p>
+      </div>
+    </div>
+    <div id="ageBadge">Usia 3–6 Tahun</div>
+
+    <div id="celebrate">
+      <div class="msg">
+        <p class="big">🎉 Hebat! 🎉</p>
+        <p class="small">Ayo cari huruf baru!</p>
+      </div>
+    </div>
+
+    <div id="startOverlay">
+      <svg class="startIcons" viewBox="0 0 220 70" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="35" cy="35" r="30" fill="#FFFFFF" stroke="#DCDCDC" stroke-width="2"/>
+        <polygon points="35,15 43,21 40,30 30,30 27,21" fill="#2b2b2b"/>
+        <text x="35" y="47" font-family="Arial" font-weight="900" font-size="22" fill="#2b2b2b" text-anchor="middle">b</text>
+        <rect x="90" y="12" width="46" height="46" rx="8" fill="#3E9DE0"/>
+        <text x="113" y="42" font-family="Arial" font-weight="900" font-size="24" fill="#FFFFFF" text-anchor="middle">b</text>
+        <rect x="160" y="18" width="55" height="34" rx="11" fill="#FFC93E"/>
+        <rect x="167" y="24" width="14" height="12" rx="2" fill="#BEE7FF"/>
+        <rect x="186" y="24" width="14" height="12" rx="2" fill="#BEE7FF"/>
+        <circle cx="172" cy="55" r="7" fill="#333"/>
+        <circle cx="203" cy="55" r="7" fill="#333"/>
+      </svg>
+      <h1>BERBURU HURUF</h1>
+      <p>Sentuh benda yang namanya diawali dengan huruf yang diminta. Yuk mulai berburu!</p>
+      <button id="startBtn">MULAI ▶</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- HAND-DRAWN VECTOR ICONS (no emoji fonts -> renders identically on every device) ----------
+  function face(cx, cy, s){
+    s = s || 1;
+    var ex = 10*s, er = 4.2*s, ery = 5.2*s;
+    var cheekX = 15*s, cheekY = 9*s, cheekR = 5.5*s;
+    var mouthW = 9*s, mouthY = 9*s, mouthDip = 7*s;
+    return ''
+      + '<ellipse cx="'+(cx-ex)+'" cy="'+cy+'" rx="'+er+'" ry="'+ery+'" fill="#2b2b2b"/>'
+      + '<ellipse cx="'+(cx+ex)+'" cy="'+cy+'" rx="'+er+'" ry="'+ery+'" fill="#2b2b2b"/>'
+      + '<circle cx="'+(cx-ex-1.3*s)+'" cy="'+(cy-1.8*s)+'" r="'+(1.4*s)+'" fill="#fff"/>'
+      + '<circle cx="'+(cx+ex-1.3*s)+'" cy="'+(cy-1.8*s)+'" r="'+(1.4*s)+'" fill="#fff"/>'
+      + '<circle cx="'+(cx-cheekX)+'" cy="'+(cy+cheekY)+'" r="'+cheekR+'" fill="#FF9E9E" opacity="0.6"/>'
+      + '<circle cx="'+(cx+cheekX)+'" cy="'+(cy+cheekY)+'" r="'+cheekR+'" fill="#FF9E9E" opacity="0.6"/>'
+      + '<path d="M '+(cx-mouthW)+' '+(cy+mouthY)+' Q '+cx+' '+(cy+mouthY+mouthDip)+' '+(cx+mouthW)+' '+(cy+mouthY)+'" stroke="#2b2b2b" stroke-width="'+(2.6*s)+'" fill="none" stroke-linecap="round"/>';
+  }
+  function eyesOnly(cx, cy, s){
+    s = s || 1;
+    var ex = 9*s, er = 3.6*s, ery = 4.4*s;
+    return ''
+      + '<ellipse cx="'+(cx-ex)+'" cy="'+cy+'" rx="'+er+'" ry="'+ery+'" fill="#2b2b2b"/>'
+      + '<ellipse cx="'+(cx+ex)+'" cy="'+cy+'" rx="'+er+'" ry="'+ery+'" fill="#2b2b2b"/>'
+      + '<circle cx="'+(cx-ex-1*s)+'" cy="'+(cy-1.5*s)+'" r="'+(1.2*s)+'" fill="#fff"/>'
+      + '<circle cx="'+(cx+ex-1*s)+'" cy="'+(cy-1.5*s)+'" r="'+(1.2*s)+'" fill="#fff"/>';
+  }
+  function letter(x, y, ch, color, size, strokeCol){
+    size = size || 32;
+    var stroke = strokeCol ? ' stroke="'+strokeCol+'" stroke-width="2" paint-order="stroke"' : '';
+    return '<text x="'+x+'" y="'+y+'" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="'+size+'" fill="'+color+'" text-anchor="middle" dominant-baseline="central" alignment-baseline="central"'+stroke+'>'+ch+'</text>';
+  }
+  function svg(inner){
+    return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'+inner+'</svg>';
+  }
+
+  var OBJECTS = [
+    {name:"apel", letter:"a", art: svg(
+      '<ellipse cx="50" cy="58" rx="30" ry="28" fill="#FF5252"/>'
+      + '<rect x="46" y="16" width="7" height="15" rx="3" fill="#7A4B23"/>'
+      + '<ellipse cx="63" cy="20" rx="10" ry="6" fill="#4CAF50" transform="rotate(-25 63 20)"/>'
+      + face(48,52,0.95)
+      + letter(50,79,'a','#FFFFFF',34,'#C23B3B')
+    )},
+    {name:"bola", letter:"b", art: svg(
+      '<circle cx="50" cy="55" r="33" fill="#FFFFFF" stroke="#DCDCDC" stroke-width="2"/>'
+      + '<polygon points="50,29 58,35 55,44 45,44 42,35" fill="#2b2b2b"/>'
+      + '<polygon points="23,49 31,44 37,51 33,60 24,59" fill="#2b2b2b" opacity="0.9"/>'
+      + '<polygon points="77,49 69,44 63,51 67,60 76,59" fill="#2b2b2b" opacity="0.9"/>'
+      + face(50,52,0.85)
+      + letter(50,78,'b','#2b2b2b',32)
+    )},
+    {name:"buku", letter:"b", art: svg(
+      '<rect x="18" y="22" width="64" height="60" rx="8" fill="#3E9DE0"/>'
+      + '<rect x="18" y="22" width="10" height="60" rx="4" fill="#2D7FBE"/>'
+      + '<polygon points="64,22 79,22 79,42 71.5,35 64,42" fill="#FF6B4A"/>'
+      + face(50,45,0.8)
+      + letter(53,68,'b','#FFFFFF',32,'#1c5c8a')
+    )},
+    {name:"bus", letter:"b", art: svg(
+      '<rect x="9" y="29" width="82" height="43" rx="13" fill="#FFC93E"/>'
+      + '<rect x="15" y="35" width="20" height="16" rx="3" fill="#BEE7FF"/>'
+      + '<rect x="40" y="35" width="20" height="16" rx="3" fill="#BEE7FF"/>'
+      + '<rect x="65" y="35" width="16" height="16" rx="3" fill="#BEE7FF"/>'
+      + '<circle cx="27" cy="77" r="10" fill="#333"/>'
+      + '<circle cx="73" cy="77" r="10" fill="#333"/>'
+      + '<circle cx="27" cy="77" r="3.5" fill="#999"/>'
+      + '<circle cx="73" cy="77" r="3.5" fill="#999"/>'
+      + eyesOnly(50,43,0.3)
+      + letter(50,61,'b','#8A5A00',28)
+    )},
+    {name:"boneka", letter:"b", art: svg(
+      '<circle cx="27" cy="26" r="11" fill="#C98B4B"/>'
+      + '<circle cx="73" cy="26" r="11" fill="#C98B4B"/>'
+      + '<circle cx="50" cy="40" r="26" fill="#D8A05F"/>'
+      + '<ellipse cx="50" cy="80" rx="24" ry="19" fill="#C98B4B"/>'
+      + face(50,40,0.9)
+      + letter(50,80,'b','#FFFFFF',32,'#7A4B23')
+    )},
+    {name:"mobil", letter:"m", art: svg(
+      '<rect x="30" y="22" width="40" height="22" rx="9" fill="#FF6B4A"/>'
+      + '<rect x="35" y="26" width="30" height="14" rx="4" fill="#BEE7FF"/>'
+      + '<rect x="12" y="40" width="76" height="27" rx="11" fill="#FF6B4A"/>'
+      + '<circle cx="30" cy="73" r="10" fill="#2b2b2b"/>'
+      + '<circle cx="70" cy="73" r="10" fill="#2b2b2b"/>'
+      + '<circle cx="30" cy="73" r="3.5" fill="#999"/>'
+      + '<circle cx="70" cy="73" r="3.5" fill="#999"/>'
+      + eyesOnly(50,33,0.32)
+      + letter(50,55,'m','#8A2E00',28,'#fff')
+    )},
+    {name:"ikan", letter:"i", art: svg(
+      '<polygon points="72,50 94,34 94,66" fill="#3EC6E0"/>'
+      + '<ellipse cx="44" cy="50" rx="32" ry="22" fill="#4FD2E8"/>'
+      + '<polygon points="38,30 48,16 56,31" fill="#8FE7F5"/>'
+      + '<circle cx="22" cy="46" r="4" fill="#2b2b2b"/>'
+      + '<circle cx="20.7" cy="44.5" r="1.2" fill="#fff"/>'
+      + letter(48,56,'i','#0B5568',34,'#fff')
+    )},
+    {name:"kucing", letter:"k", art: svg(
+      '<polygon points="22,38 14,12 42,28" fill="#F0A24A"/>'
+      + '<polygon points="78,38 86,12 58,28" fill="#F0A24A"/>'
+      + '<polygon points="24,35 20,20 36,29" fill="#FFC98A"/>'
+      + '<polygon points="76,35 80,20 64,29" fill="#FFC98A"/>'
+      + '<circle cx="50" cy="52" r="30" fill="#F0A24A"/>'
+      + face(50,50,0.95)
+      + letter(50,74,'k','#FFFFFF',30,'#B9740E')
+    )},
+    {name:"anjing", letter:"a", art: svg(
+      '<ellipse cx="18" cy="46" rx="12" ry="20" fill="#B97A3E" transform="rotate(-15 18 46)"/>'
+      + '<ellipse cx="82" cy="46" rx="12" ry="20" fill="#B97A3E" transform="rotate(15 82 46)"/>'
+      + '<circle cx="50" cy="50" r="28" fill="#D9A066"/>'
+      + '<ellipse cx="50" cy="60" rx="10" ry="7" fill="#F0D5AE"/>'
+      + face(50,48,0.9)
+      + letter(50,73,'a','#FFFFFF',30,'#8A5A2E')
+    )},
+    {name:"pensil", letter:"p", art: svg(
+      '<rect x="38" y="30" width="24" height="52" rx="3" fill="#FFDD55"/>'
+      + '<polygon points="38,30 62,30 50,8" fill="#F5C99B"/>'
+      + '<polygon points="46,13 54,13 50,4" fill="#3b2410"/>'
+      + '<rect x="36" y="76" width="28" height="14" rx="4" fill="#FF8FA3"/>'
+      + '<rect x="36" y="72" width="28" height="6" fill="#D8D8D8"/>'
+      + letter(50,54,'p','#8A5A00',32,'#fff')
+    )},
+    {name:"topi", letter:"t", art: svg(
+      '<ellipse cx="50" cy="82" rx="30" ry="9" fill="#7264E0"/>'
+      + '<polygon points="50,12 26,82 74,82" fill="#B0A6FF"/>'
+      + '<circle cx="50" cy="12" r="8" fill="#FFD24C"/>'
+      + face(50,58,0.7)
+      + letter(50,74,'t','#FFFFFF',30,'#5B4FBE')
+    )},
+    {name:"jam", letter:"j", art: svg(
+      '<circle cx="34" cy="18" r="8" fill="#FF6B4A"/>'
+      + '<circle cx="66" cy="18" r="8" fill="#FF6B4A"/>'
+      + '<circle cx="50" cy="54" r="32" fill="#FFF6E0" stroke="#F2C24A" stroke-width="4"/>'
+      + '<line x1="50" y1="54" x2="50" y2="36" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"/>'
+      + '<line x1="50" y1="54" x2="63" y2="54" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"/>'
+      + '<circle cx="50" cy="54" r="3" fill="#2b2b2b"/>'
+      + face(50,64,0.62)
+      + letter(50,78,'j','#8A5A00',26)
+    )},
+    {name:"pohon", letter:"p", art: svg(
+      '<rect x="42" y="66" width="16" height="24" rx="4" fill="#8B5A2B"/>'
+      + '<circle cx="33" cy="38" r="21" fill="#5CB85C"/>'
+      + '<circle cx="67" cy="38" r="21" fill="#5CB85C"/>'
+      + '<circle cx="50" cy="26" r="23" fill="#6FCB5E"/>'
+      + face(50,38,0.85)
+      + letter(50,81,'p','#FFFFFF',26,'#5A3A1A')
+    )},
+    {name:"wortel", letter:"w", art: svg(
+      '<ellipse cx="42" cy="10" rx="6" ry="15" fill="#4CAF50" transform="rotate(-18 42 10)"/>'
+      + '<ellipse cx="58" cy="10" rx="6" ry="15" fill="#4CAF50" transform="rotate(18 58 10)"/>'
+      + '<ellipse cx="50" cy="6" rx="5" ry="13" fill="#66BB6A"/>'
+      + '<polygon points="50,22 24,90 76,90" fill="#F08A2E"/>'
+      + face(50,52,0.8)
+      + letter(50,76,'w','#FFFFFF',28,'#B35F17')
+    )},
+    {name:"sepatu", letter:"s", art: svg(
+      '<rect x="8" y="72" width="82" height="15" rx="7" fill="#3E2A17"/>'
+      + '<path d="M18,72 Q14,38 42,32 Q72,26 88,52 Q92,62 88,72 Z" fill="#3E9DE0"/>'
+      + '<ellipse cx="40" cy="42" rx="14" ry="6" fill="#BEE7FF" opacity="0.7"/>'
+      + face(52,50,0.7)
+      + letter(60,42,'s','#FFFFFF',26,'#1c5c8a')
+    )},
+    {name:"layangan", letter:"l", art: svg(
+      '<polygon points="50,8 82,50 50,92 18,50" fill="#E0509F"/>'
+      + '<line x1="50" y1="8" x2="50" y2="92" stroke="#fff" stroke-width="2" opacity="0.7"/>'
+      + '<line x1="18" y1="50" x2="82" y2="50" stroke="#fff" stroke-width="2" opacity="0.7"/>'
+      + face(50,45,0.75)
+      + letter(50,67,'l','#FFFFFF',30,'#A02E6E')
+    )},
+    {name:"gelas", letter:"g", art: svg(
+      '<path d="M30,26 L70,26 L62,88 L38,88 Z" fill="#4FD9B0"/>'
+      + '<ellipse cx="50" cy="26" rx="20" ry="6" fill="#2FBE99"/>'
+      + '<rect x="47" y="10" width="6" height="20" rx="3" fill="#FF6B4A" transform="rotate(8 50 20)"/>'
+      + face(50,50,0.75)
+      + letter(50,74,'g','#0B5A44',28,'#fff')
+    )},
+    {name:"lampu", letter:"l", art: svg(
+      '<rect x="41" y="68" width="18" height="14" rx="3" fill="#B0AA8A"/>'
+      + '<line x1="43" y1="72" x2="57" y2="72" stroke="#8A8560" stroke-width="1.5"/>'
+      + '<line x1="43" y1="77" x2="57" y2="77" stroke="#8A8560" stroke-width="1.5"/>'
+      + '<circle cx="50" cy="42" r="27" fill="#FFF3A0"/>'
+      + face(50,42,0.85)
+      + letter(50,60,'l','#8A7A00',28)
+    )},
+    {name:"robot", letter:"r", art: svg(
+      '<line x1="50" y1="24" x2="50" y2="10" stroke="#8A8A8A" stroke-width="3"/>'
+      + '<circle cx="50" cy="8" r="5" fill="#FF6B4A"/>'
+      + '<rect x="22" y="24" width="56" height="48" rx="12" fill="#8890E0"/>'
+      + '<rect x="30" y="60" width="40" height="8" rx="3" fill="#5B5FC0"/>'
+      + eyesOnly(50,42,0.55)
+      + letter(50,66,'r','#FFFFFF',26,'#5B5FC0')
+    )}
+  ];
+
+  var GOAL_PER_ROUND = 5;
+  var MAX_OBJECTS = 4;
+  var SPAWN_GAP_MS = 650;
+
+  // ---------- STATE ----------
+  var score = 0;
+  var progress = 0;
+  var targetLetter = "b";
+  var running = false;
+  var lastSpawn = 0;
+  var lastFrame = 0;
+  var objects = []; // {el, top, speed, baseX, bobPhase, bobAmp, letter}
+  var idCounter = 0;
+
+  // ---------- DOM ----------
+  var playArea = document.getElementById("playArea");
+  var skorVal = document.getElementById("skorVal");
+  var terkumpulVal = document.getElementById("terkumpulVal");
+  var targetLetterEl = document.getElementById("targetLetter");
+  var celebrateEl = document.getElementById("celebrate");
+  var startOverlay = document.getElementById("startOverlay");
+  var startBtn = document.getElementById("startBtn");
+  var game = document.getElementById("game");
+
+  // ---------- AUDIO ----------
+  var audioCtx = null;
+  function ensureAudio(){
+    if(!audioCtx){
+      try{
+        var AC = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AC();
+      }catch(e){ audioCtx = null; }
+    }
+    if(audioCtx && audioCtx.state === "suspended"){
+      audioCtx.resume();
+    }
+  }
+  function tone(freq, start, dur, type, vol){
+    if(!audioCtx) return;
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.type = type || "sine";
+    osc.frequency.setValueAtTime(freq, start);
+    gain.gain.setValueAtTime(0, start);
+    gain.gain.linearRampToValueAtTime(vol||0.25, start+0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, start+dur);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(start);
+    osc.stop(start+dur+0.02);
+  }
+  function playDing(){
+    if(!audioCtx) return;
+    var t = audioCtx.currentTime;
+    tone(880, t, 0.12, "sine", 0.22);
+    tone(1320, t+0.09, 0.18, "sine", 0.2);
+  }
+  function playWrong(){
+    if(!audioCtx) return;
+    var t = audioCtx.currentTime;
+    tone(220, t, 0.18, "sine", 0.15);
+  }
+  function playCelebrate(){
+    if(!audioCtx) return;
+    var t = audioCtx.currentTime;
+    [660,880,990,1320].forEach(function(f,i){
+      tone(f, t+i*0.09, 0.16, "triangle", 0.18);
+    });
+  }
+
+  // ---------- HELPERS ----------
+  function rand(min,max){ return Math.random()*(max-min)+min; }
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  function distinctLetters(){
+    var set = {};
+    OBJECTS.forEach(function(o){ set[o.letter] = true; });
+    return Object.keys(set);
+  }
+
+  function pickNewTarget(){
+    var letters = distinctLetters();
+    var choice;
+    do{
+      choice = pick(letters);
+    }while(choice === targetLetter && letters.length > 1);
+    targetLetter = choice;
+    targetLetterEl.textContent = targetLetter;
+    targetLetterEl.classList.remove("pulse");
+    void targetLetterEl.offsetWidth;
+    targetLetterEl.classList.add("pulse");
+  }
+
+  function chooseWord(){
+    // ~45% chance to spawn a correct-letter object, else a distractor
+    var correctPool = OBJECTS.filter(function(o){ return o.letter === targetLetter; });
+    var wrongPool = OBJECTS.filter(function(o){ return o.letter !== targetLetter; });
+    if(Math.random() < 0.45 && correctPool.length){
+      return pick(correctPool);
+    }
+    return pick(wrongPool.length ? wrongPool : OBJECTS);
+  }
+
+  function spawnObject(){
+    if(objects.length >= MAX_OBJECTS) return;
+    var word = chooseWord();
+    var areaH = playArea.clientHeight;
+    var areaW = playArea.clientWidth;
+
+    var el = document.createElement("div");
+    el.className = "obj";
+    var sizeGuess = Math.min(areaW, areaH) * 0.32;
+    var leftPct = rand(3, 65);
+    el.style.left = leftPct + "%";
+    el.style.top = (areaH + sizeGuess) + "px";
+
+    el.innerHTML = word.art;
+
+    el.dataset.letter = word.letter;
+    el.dataset.id = (++idCounter);
+
+    playArea.appendChild(el);
+
+    var obj = {
+      id: idCounter,
+      el: el,
+      top: areaH + sizeGuess,
+      speed: rand(140, 210), // px per second
+      baseLeft: leftPct,
+      bobPhase: rand(0, Math.PI*2),
+      bobAmp: rand(4, 10),
+      bobSpeed: rand(1.2, 2.2),
+      letter: word.letter,
+      dead: false
+    };
+
+    el.addEventListener("pointerdown", function(e){
+      e.preventDefault();
+      handleTap(obj);
+    }, {passive:false});
+
+    objects.push(obj);
+  }
+
+  function removeObject(obj){
+    obj.dead = true;
+    if(obj.el && obj.el.parentNode){
+      obj.el.parentNode.removeChild(obj.el);
+    }
+    objects = objects.filter(function(o){ return o !== obj; });
+  }
+
+  function spawnSparkles(x, y){
+    var emojis = ["✨","⭐","🌟"];
+    for(var i=0;i<6;i++){
+      var s = document.createElement("div");
+      s.className = "sparkle";
+      s.textContent = pick(emojis);
+      s.style.left = x + "px";
+      s.style.top = y + "px";
+      var dx = rand(-60,60);
+      var dy = rand(-70,-10);
+      s.style.setProperty("--dx", dx + "px");
+      s.style.setProperty("--dy", dy + "px");
+      playArea.appendChild(s);
+      (function(node){
+        setTimeout(function(){
+          if(node.parentNode) node.parentNode.removeChild(node);
+        }, 650);
+      })(s);
+    }
+  }
+
+  function handleTap(obj){
+    if(!running || obj.dead) return;
+    ensureAudio();
+    var rect = obj.el.getBoundingClientRect();
+    var areaRect = playArea.getBoundingClientRect();
+    var cx = rect.left - areaRect.left + rect.width/2;
+    var cy = rect.top - areaRect.top + rect.height/2;
+
+    if(obj.letter === targetLetter){
+      // correct
+      obj.dead = true;
+      obj.el.classList.add("correct-pop");
+      spawnSparkles(cx, cy);
+      playDing();
+      score += 1;
+      progress += 1;
+      skorVal.textContent = score;
+      terkumpulVal.textContent = progress + "/" + GOAL_PER_ROUND;
+
+      setTimeout(function(){
+        removeObject(obj);
+      }, 420);
+
+      if(progress >= GOAL_PER_ROUND){
+        setTimeout(function(){
+          celebrateRound();
+        }, 200);
+      }
+    } else {
+      // wrong
+      playWrong();
+      obj.el.classList.remove("wrong-shake");
+      void obj.el.offsetWidth;
+      obj.el.classList.add("wrong-shake");
+      setTimeout(function(){
+        if(obj.el) obj.el.classList.remove("wrong-shake");
+      }, 420);
+    }
+  }
+
+  function celebrateRound(){
+    running = false;
+    playCelebrate();
+    celebrateEl.classList.add("show");
+    setTimeout(function(){
+      celebrateEl.classList.remove("show");
+      progress = 0;
+      terkumpulVal.textContent = "0/" + GOAL_PER_ROUND;
+      pickNewTarget();
+      running = true;
+    }, 1600);
+  }
+
+  // ---------- LOOP ----------
+  function frame(ts){
+    if(!lastFrame) lastFrame = ts;
+    var dt = (ts - lastFrame) / 1000;
+    lastFrame = ts;
+
+    if(running){
+      var areaH = playArea.clientHeight;
+
+      objects.forEach(function(obj){
+        if(obj.dead) return;
+        obj.top -= obj.speed * dt;
+        obj.bobPhase += dt * obj.bobSpeed;
+        var bobX = Math.sin(obj.bobPhase) * obj.bobAmp;
+        obj.el.style.top = obj.top + "px";
+        obj.el.style.transform = "translateX(" + bobX + "px)";
+
+        if(obj.top < -120){
+          removeObject(obj);
+        }
+      });
+
+      if(ts - lastSpawn > SPAWN_GAP_MS && objects.length < MAX_OBJECTS){
+        spawnObject();
+        lastSpawn = ts;
+      }
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  // ---------- START ----------
+  function startGame(){
+    ensureAudio();
+    startOverlay.style.display = "none";
+    running = true;
+    score = 0;
+    progress = 0;
+    skorVal.textContent = "0";
+    terkumpulVal.textContent = "0/" + GOAL_PER_ROUND;
+    pickNewTarget();
+    // seed a couple of objects right away
+    for(var i=0;i<3;i++){
+      setTimeout(spawnObject, i*300);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  startBtn.addEventListener("click", startGame);
+  startBtn.addEventListener("touchend", function(e){ e.preventDefault(); startGame(); }, {passive:false});
+
+})();
+</script>
+</body>
+</html>
