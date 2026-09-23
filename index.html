@@ -465,32 +465,24 @@
   function svg(inner){
     return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'+inner+'</svg>';
   }
+  function imageIcon(url, clipId){
+    return svg(
+      '<defs><clipPath id="clip-'+clipId+'"><circle cx="50" cy="50" r="46"/></clipPath></defs>'
+      + '<circle cx="50" cy="50" r="47" fill="#FFFFFF"/>'
+      + '<image href="'+url+'" x="2" y="2" width="96" height="96" preserveAspectRatio="xMidYMid slice" clip-path="url(#clip-'+clipId+')"/>'
+      + '<circle cx="50" cy="50" r="47" fill="none" stroke="#FFFFFF" stroke-width="5"/>'
+    );
+  }
 
   var OBJECTS = [
-    {name:"objek-a", letter:"a", art: svg(
-      '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-01.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
-    )},
-    {name:"objek-b", letter:"b", art: svg(
-      '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-02.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
-    )},
-    {name:"objek-c", letter:"c", art: svg(
-      '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-03.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
-    )},
-    {name:"objek-d", letter:"d", art: svg(
-      '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-04.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
-    )},
-    {name:"objek-e", letter:"e", art: svg(
-      '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-05.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
-    )},
-    {name:"objek-f", letter:"f", art: svg(
-      '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-06.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
-    )},
-    {name:"objek-g", letter:"g", art: svg(
-      '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-07.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
-    )},
-    {name:"objek-h", letter:"h", art: svg(
-      '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-08.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
-    )}
+    {name:"objek-a", letter:"a", art: imageIcon("https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-01.png", "a")},
+    {name:"objek-b", letter:"b", art: imageIcon("https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-02.png", "b")},
+    {name:"objek-c", letter:"c", art: imageIcon("https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-03.png", "c")},
+    {name:"objek-d", letter:"d", art: imageIcon("https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-04.png", "d")},
+    {name:"objek-e", letter:"e", art: imageIcon("https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-05.png", "e")},
+    {name:"objek-f", letter:"f", art: imageIcon("https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-06.png", "f")},
+    {name:"objek-g", letter:"g", art: imageIcon("https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-07.png", "g")},
+    {name:"objek-h", letter:"h", art: imageIcon("https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-08.png", "h")}
   ];
 
   var GOAL_PER_ROUND = 5;
@@ -590,6 +582,18 @@
       if(idVoice) utter.voice = idVoice;
       utter.rate = 0.9;
       utter.pitch = 1.15;
+      window.speechSynthesis.speak(utter);
+    }catch(e){ /* speech not supported, ignore */ }
+  }
+  function speakLetterSound(ch){
+    if(!window.speechSynthesis) return;
+    try{
+      window.speechSynthesis.cancel();
+      var utter = new SpeechSynthesisUtterance(ch);
+      utter.lang = "id-ID";
+      if(idVoice) utter.voice = idVoice;
+      utter.rate = 0.7;
+      utter.pitch = 1.3;
       window.speechSynthesis.speak(utter);
     }catch(e){ /* speech not supported, ignore */ }
   }
@@ -712,6 +716,7 @@
       obj.el.classList.add("correct-pop");
       spawnSparkles(cx, cy);
       playDing();
+      speakLetterSound(obj.letter);
       score += 1;
       progress += 1;
       skorVal.textContent = score;
