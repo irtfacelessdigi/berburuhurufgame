@@ -451,153 +451,29 @@
   }
 
   var OBJECTS = [
-   {name:"apel", letter:"a", art: svg(
-  '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-01.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
-  + letter(50,92,'a','#FFFFFF',22,'#C23B3B')
-)},
-    {name:"bola", letter:"b", art: svg(
-  '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-02.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
-)},
-    {name:"buku", letter:"b", art: svg(
-      '<rect x="18" y="22" width="64" height="60" rx="8" fill="#3E9DE0"/>'
-      + '<rect x="18" y="22" width="10" height="60" rx="4" fill="#2D7FBE"/>'
-      + '<polygon points="64,22 79,22 79,42 71.5,35 64,42" fill="#FF6B4A"/>'
-      + face(50,45,0.8)
-      + letter(53,68,'b','#FFFFFF',32,'#1c5c8a')
+    {name:"objek-a", letter:"a", art: svg(
+      '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-01.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
     )},
-    {name:"bus", letter:"b", art: svg(
-      '<rect x="9" y="29" width="82" height="43" rx="13" fill="#FFC93E"/>'
-      + '<rect x="15" y="35" width="20" height="16" rx="3" fill="#BEE7FF"/>'
-      + '<rect x="40" y="35" width="20" height="16" rx="3" fill="#BEE7FF"/>'
-      + '<rect x="65" y="35" width="16" height="16" rx="3" fill="#BEE7FF"/>'
-      + '<circle cx="27" cy="77" r="10" fill="#333"/>'
-      + '<circle cx="73" cy="77" r="10" fill="#333"/>'
-      + '<circle cx="27" cy="77" r="3.5" fill="#999"/>'
-      + '<circle cx="73" cy="77" r="3.5" fill="#999"/>'
-      + eyesOnly(50,43,0.3)
-      + letter(50,61,'b','#8A5A00',28)
+    {name:"objek-b", letter:"b", art: svg(
+      '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-02.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
     )},
-    {name:"boneka", letter:"b", art: svg(
-      '<circle cx="27" cy="26" r="11" fill="#C98B4B"/>'
-      + '<circle cx="73" cy="26" r="11" fill="#C98B4B"/>'
-      + '<circle cx="50" cy="40" r="26" fill="#D8A05F"/>'
-      + '<ellipse cx="50" cy="80" rx="24" ry="19" fill="#C98B4B"/>'
-      + face(50,40,0.9)
-      + letter(50,80,'b','#FFFFFF',32,'#7A4B23')
+    {name:"objek-c", letter:"c", art: svg(
+      '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-03.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
     )},
-    {name:"mobil", letter:"m", art: svg(
-      '<rect x="30" y="22" width="40" height="22" rx="9" fill="#FF6B4A"/>'
-      + '<rect x="35" y="26" width="30" height="14" rx="4" fill="#BEE7FF"/>'
-      + '<rect x="12" y="40" width="76" height="27" rx="11" fill="#FF6B4A"/>'
-      + '<circle cx="30" cy="73" r="10" fill="#2b2b2b"/>'
-      + '<circle cx="70" cy="73" r="10" fill="#2b2b2b"/>'
-      + '<circle cx="30" cy="73" r="3.5" fill="#999"/>'
-      + '<circle cx="70" cy="73" r="3.5" fill="#999"/>'
-      + eyesOnly(50,33,0.32)
-      + letter(50,55,'m','#8A2E00',28,'#fff')
+    {name:"objek-d", letter:"d", art: svg(
+      '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-04.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
     )},
-    {name:"ikan", letter:"i", art: svg(
-      '<polygon points="72,50 94,34 94,66" fill="#3EC6E0"/>'
-      + '<ellipse cx="44" cy="50" rx="32" ry="22" fill="#4FD2E8"/>'
-      + '<polygon points="38,30 48,16 56,31" fill="#8FE7F5"/>'
-      + '<circle cx="22" cy="46" r="4" fill="#2b2b2b"/>'
-      + '<circle cx="20.7" cy="44.5" r="1.2" fill="#fff"/>'
-      + letter(48,56,'i','#0B5568',34,'#fff')
+    {name:"objek-e", letter:"e", art: svg(
+      '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-05.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
     )},
-    {name:"kucing", letter:"k", art: svg(
-      '<polygon points="22,38 14,12 42,28" fill="#F0A24A"/>'
-      + '<polygon points="78,38 86,12 58,28" fill="#F0A24A"/>'
-      + '<polygon points="24,35 20,20 36,29" fill="#FFC98A"/>'
-      + '<polygon points="76,35 80,20 64,29" fill="#FFC98A"/>'
-      + '<circle cx="50" cy="52" r="30" fill="#F0A24A"/>'
-      + face(50,50,0.95)
-      + letter(50,74,'k','#FFFFFF',30,'#B9740E')
+    {name:"objek-f", letter:"f", art: svg(
+      '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-06.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
     )},
-    {name:"anjing", letter:"a", art: svg(
-      '<ellipse cx="18" cy="46" rx="12" ry="20" fill="#B97A3E" transform="rotate(-15 18 46)"/>'
-      + '<ellipse cx="82" cy="46" rx="12" ry="20" fill="#B97A3E" transform="rotate(15 82 46)"/>'
-      + '<circle cx="50" cy="50" r="28" fill="#D9A066"/>'
-      + '<ellipse cx="50" cy="60" rx="10" ry="7" fill="#F0D5AE"/>'
-      + face(50,48,0.9)
-      + letter(50,73,'a','#FFFFFF',30,'#8A5A2E')
+    {name:"objek-g", letter:"g", art: svg(
+      '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-07.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
     )},
-    {name:"pensil", letter:"p", art: svg(
-      '<rect x="38" y="30" width="24" height="52" rx="3" fill="#FFDD55"/>'
-      + '<polygon points="38,30 62,30 50,8" fill="#F5C99B"/>'
-      + '<polygon points="46,13 54,13 50,4" fill="#3b2410"/>'
-      + '<rect x="36" y="76" width="28" height="14" rx="4" fill="#FF8FA3"/>'
-      + '<rect x="36" y="72" width="28" height="6" fill="#D8D8D8"/>'
-      + letter(50,54,'p','#8A5A00',32,'#fff')
-    )},
-    {name:"topi", letter:"t", art: svg(
-      '<ellipse cx="50" cy="82" rx="30" ry="9" fill="#7264E0"/>'
-      + '<polygon points="50,12 26,82 74,82" fill="#B0A6FF"/>'
-      + '<circle cx="50" cy="12" r="8" fill="#FFD24C"/>'
-      + face(50,58,0.7)
-      + letter(50,74,'t','#FFFFFF',30,'#5B4FBE')
-    )},
-    {name:"jam", letter:"j", art: svg(
-      '<circle cx="34" cy="18" r="8" fill="#FF6B4A"/>'
-      + '<circle cx="66" cy="18" r="8" fill="#FF6B4A"/>'
-      + '<circle cx="50" cy="54" r="32" fill="#FFF6E0" stroke="#F2C24A" stroke-width="4"/>'
-      + '<line x1="50" y1="54" x2="50" y2="36" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"/>'
-      + '<line x1="50" y1="54" x2="63" y2="54" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"/>'
-      + '<circle cx="50" cy="54" r="3" fill="#2b2b2b"/>'
-      + face(50,64,0.62)
-      + letter(50,78,'j','#8A5A00',26)
-    )},
-    {name:"pohon", letter:"p", art: svg(
-      '<rect x="42" y="66" width="16" height="24" rx="4" fill="#8B5A2B"/>'
-      + '<circle cx="33" cy="38" r="21" fill="#5CB85C"/>'
-      + '<circle cx="67" cy="38" r="21" fill="#5CB85C"/>'
-      + '<circle cx="50" cy="26" r="23" fill="#6FCB5E"/>'
-      + face(50,38,0.85)
-      + letter(50,81,'p','#FFFFFF',26,'#5A3A1A')
-    )},
-    {name:"wortel", letter:"w", art: svg(
-      '<ellipse cx="42" cy="10" rx="6" ry="15" fill="#4CAF50" transform="rotate(-18 42 10)"/>'
-      + '<ellipse cx="58" cy="10" rx="6" ry="15" fill="#4CAF50" transform="rotate(18 58 10)"/>'
-      + '<ellipse cx="50" cy="6" rx="5" ry="13" fill="#66BB6A"/>'
-      + '<polygon points="50,22 24,90 76,90" fill="#F08A2E"/>'
-      + face(50,52,0.8)
-      + letter(50,76,'w','#FFFFFF',28,'#B35F17')
-    )},
-    {name:"sepatu", letter:"s", art: svg(
-      '<rect x="8" y="72" width="82" height="15" rx="7" fill="#3E2A17"/>'
-      + '<path d="M18,72 Q14,38 42,32 Q72,26 88,52 Q92,62 88,72 Z" fill="#3E9DE0"/>'
-      + '<ellipse cx="40" cy="42" rx="14" ry="6" fill="#BEE7FF" opacity="0.7"/>'
-      + face(52,50,0.7)
-      + letter(60,42,'s','#FFFFFF',26,'#1c5c8a')
-    )},
-    {name:"layangan", letter:"l", art: svg(
-      '<polygon points="50,8 82,50 50,92 18,50" fill="#E0509F"/>'
-      + '<line x1="50" y1="8" x2="50" y2="92" stroke="#fff" stroke-width="2" opacity="0.7"/>'
-      + '<line x1="18" y1="50" x2="82" y2="50" stroke="#fff" stroke-width="2" opacity="0.7"/>'
-      + face(50,45,0.75)
-      + letter(50,67,'l','#FFFFFF',30,'#A02E6E')
-    )},
-    {name:"gelas", letter:"g", art: svg(
-      '<path d="M30,26 L70,26 L62,88 L38,88 Z" fill="#4FD9B0"/>'
-      + '<ellipse cx="50" cy="26" rx="20" ry="6" fill="#2FBE99"/>'
-      + '<rect x="47" y="10" width="6" height="20" rx="3" fill="#FF6B4A" transform="rotate(8 50 20)"/>'
-      + face(50,50,0.75)
-      + letter(50,74,'g','#0B5A44',28,'#fff')
-    )},
-    {name:"lampu", letter:"l", art: svg(
-      '<rect x="41" y="68" width="18" height="14" rx="3" fill="#B0AA8A"/>'
-      + '<line x1="43" y1="72" x2="57" y2="72" stroke="#8A8560" stroke-width="1.5"/>'
-      + '<line x1="43" y1="77" x2="57" y2="77" stroke="#8A8560" stroke-width="1.5"/>'
-      + '<circle cx="50" cy="42" r="27" fill="#FFF3A0"/>'
-      + face(50,42,0.85)
-      + letter(50,60,'l','#8A7A00',28)
-    )},
-    {name:"robot", letter:"r", art: svg(
-      '<line x1="50" y1="24" x2="50" y2="10" stroke="#8A8A8A" stroke-width="3"/>'
-      + '<circle cx="50" cy="8" r="5" fill="#FF6B4A"/>'
-      + '<rect x="22" y="24" width="56" height="48" rx="12" fill="#8890E0"/>'
-      + '<rect x="30" y="60" width="40" height="8" rx="3" fill="#5B5FC0"/>'
-      + eyesOnly(50,42,0.55)
-      + letter(50,66,'r','#FFFFFF',26,'#5B5FC0')
+    {name:"objek-h", letter:"h", art: svg(
+      '<image href="https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-08.png" x="4" y="2" width="92" height="92" preserveAspectRatio="xMidYMid meet"/>'
     )}
   ];
 
