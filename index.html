@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Berburu Huruf by irt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
     box-sizing:border-box;
@@ -167,20 +170,31 @@
     line-height:1.1;
   }
   #targetBox{
-    background:rgba(255,255,255,0.92);
-    border-radius:20px;
-    padding:4px 18px 8px;
+    background:transparent;
+    box-shadow:none;
+    padding:0;
     text-align:center;
-    box-shadow:0 4px 0 rgba(0,0,0,0.12);
   }
   #targetBox .ui-label{ color:#3a6b8a; }
+  #letterCircle{
+    width:80px;
+    height:80px;
+    margin:4px auto 0;
+    border-radius:50%;
+    background:rgba(255,255,255,0.92);
+    box-shadow:0 4px 0 rgba(0,0,0,0.12);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
   #targetLetter{
-    font-size:56px;
-    font-weight:900;
+    font-family:'Baloo 2','Comic Sans MS','Segoe UI',system-ui,sans-serif;
+    font-size:42px;
+    font-weight:800;
     line-height:1;
     color:#2E8B57;
-    -webkit-text-stroke:2px #1c5c39;
-    text-shadow:0 3px 0 rgba(0,0,0,0.15);
+    -webkit-text-stroke:1.5px #1c5c39;
+    text-shadow:0 2px 0 rgba(0,0,0,0.15);
     transition:transform 0.25s ease;
   }
   #targetLetter.pulse{ animation:pulseLetter 0.5s ease; }
@@ -376,7 +390,9 @@
       </div>
       <div id="targetBox">
         <p class="ui-label">CARI HURUF</p>
-        <div id="targetLetter">b</div>
+        <div id="letterCircle">
+          <div id="targetLetter">b</div>
+        </div>
       </div>
       <div class="ui-box">
         <p class="ui-label" id="terkumpulLabel">TERKUMPUL</p>
@@ -547,6 +563,37 @@
     });
   }
 
+  // ---------- VOICE (TTS) ----------
+  var idVoice = null;
+  function pickIndonesianVoice(){
+    if(!window.speechSynthesis) return null;
+    var voices = window.speechSynthesis.getVoices();
+    for(var i=0;i<voices.length;i++){
+      if(voices[i].lang && voices[i].lang.toLowerCase().indexOf("id") === 0){
+        return voices[i];
+      }
+    }
+    return null;
+  }
+  if(window.speechSynthesis){
+    window.speechSynthesis.onvoiceschanged = function(){
+      idVoice = pickIndonesianVoice();
+    };
+    idVoice = pickIndonesianVoice();
+  }
+  function speakTargetLetter(ch){
+    if(!window.speechSynthesis) return;
+    try{
+      window.speechSynthesis.cancel();
+      var utter = new SpeechSynthesisUtterance("Coba temukan huruf " + ch);
+      utter.lang = "id-ID";
+      if(idVoice) utter.voice = idVoice;
+      utter.rate = 0.9;
+      utter.pitch = 1.15;
+      window.speechSynthesis.speak(utter);
+    }catch(e){ /* speech not supported, ignore */ }
+  }
+
   // ---------- HELPERS ----------
   function rand(min,max){ return Math.random()*(max-min)+min; }
   function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
@@ -568,6 +615,7 @@
     targetLetterEl.classList.remove("pulse");
     void targetLetterEl.offsetWidth;
     targetLetterEl.classList.add("pulse");
+    speakTargetLetter(targetLetter);
   }
 
   function chooseWord(){
