@@ -473,9 +473,15 @@
       + '<circle cx="50" cy="50" r="47" fill="none" stroke="#FFFFFF" stroke-width="5"/>'
     );
   }
+  function plainImageIcon(url){
+    // no circle frame, no background, no border - just the image shape itself
+    return svg(
+      '<image href="'+url+'" x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid meet"/>'
+    );
+  }
 
   var OBJECTS = [
-    {name:"objek-a", letter:"a", art: imageIcon("https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/ChatGPT%20Image%20Sep%2024%2C%202026%2C%2012_33_18%20PM.png", "a")},
+    {name:"objek-a", letter:"a", art: plainImageIcon("https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/ChatGPT%20Image%20Sep%2024%2C%202026%2C%2012_33_18%20PM.png")},
     {name:"objek-b", letter:"b", art: imageIcon("https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-02.png", "b")},
     {name:"objek-c", letter:"c", art: imageIcon("https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-03.png", "c")},
     {name:"objek-d", letter:"d", art: imageIcon("https://raw.githubusercontent.com/irtfacelessdigi/berburuhurufgame/main/public/icon/slice-04.png", "d")},
